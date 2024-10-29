@@ -10,6 +10,7 @@ const UserList = () => {
 
   const handleDelete = (id) => {
     setData(data.filter(item => item.id !== id));
+    console.log(data);
   }
   const paginationModel = { page: 0, pageSize: 5 };
   
@@ -20,10 +21,12 @@ const UserList = () => {
       headerName: "User",
       width: 200,
       renderCell: (params) => {
+        console.log(params);
         return (
           <div className="userListUser">
-            <img className="userListImg" src={params.row.avatar} alt="" />
-            {params.row.username}
+            <img className="userListImg" src={params.data.avatar} alt={params.data.username} />
+
+            {params.data.username}
           </div>
         );
       },
@@ -45,15 +48,15 @@ const UserList = () => {
       width: 150,
       renderCell: (params) => {
         return (
-          <>
-            <Link to={"/user/" + params.row.id}>
+          <div className="userListUser">
+            <Link to={"/user/" + params.data.id}>
               <button className="userListEdit">Edit</button>
             </Link>
             <DeleteOutline
               className="userListDelete"
-              onClick={() => handleDelete(params.row.id)}
+              onClick={() => handleDelete(params.data.id)}
             />
-          </>
+          </div>
         );
       },
     },
