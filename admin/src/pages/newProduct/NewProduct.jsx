@@ -3,7 +3,8 @@ import './newProduct.css';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import app from '../../firebase';
 import { addProduct } from '../../redux/apiCalls';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 const NewProduct = () => {
@@ -11,6 +12,9 @@ const NewProduct = () => {
     const [file, setFile] = useState(null);
     const [cat, setCat] = useState([]);
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setInputs(prev => {
@@ -18,7 +22,7 @@ const NewProduct = () => {
         });
     };
 
-    console.log(inputs)
+    // console.log(inputs)
 
     const handleCat = (e) => {
         setCat(e.target.value.split(","));
@@ -29,6 +33,9 @@ const NewProduct = () => {
         const fileName = new Date().getTime() + file.name;
         const storage = getStorage(app);
         const storageRef = ref(storage, fileName);
+
+        setLoading(true);
+        setError(null);
 
         // File upload logic
         const uploadTask = uploadBytesResumable(storageRef, file);
@@ -51,16 +58,30 @@ const NewProduct = () => {
             },
             (error) => {
                 console.error("Upload failed:", error);
+                setError("File upload failed. Please try again.");
+                setLoading(false);
             },
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
                     const product = { ...inputs, image: downloadURL, categories: cat };
                     console.log(product)
-                    addProduct(dispatch,product);
+                    addProduct(dispatch, product)
+                        .then(() => {
+                            setLoading(false);
+                            alert("Product created successfully!");
+                            navigate('/products')
+                        })
+                        .catch((error) => {
+                            setError("Product creation failed. Please try again.");
+                            setLoading(false);
+                        })
                 });
             }
         );
     };
+
+    // Warn user before leaving if still loading
+    window.onbeforeunload = loading ? () => true : null;
 
     return (
         <div className="newProduct">
@@ -87,13 +108,20 @@ const NewProduct = () => {
                     <input type="text" placeholder="jeans, skirts" onChange={handleCat} />
                 </div>
                 <div className="addProductItem">
+                    <label>Promotion</label>
+                    <input name='promotion' min={0} max={99} type="number" placeholder="100" onChange={handleChange} />
+                </div>
+                <div className="addProductItem">
                     <label>Stock</label>
                     <select name="inStock" id="stock" onChange={handleChange}>
                         <option value="true">Yes</option>
                         <option value="false">No</option>
                     </select>
                 </div>
-                <button onClick={handleClick} className="addProductButton">Create</button>
+
+                <button onClick={handleClick} className="addProductButton" disabled={loading}>{loading ? 'Creating...' : 'Create'}</button>
+                {loading && <p>Creating product, please wait...</p>}
+                {error && <p className='error'>{error}</p>}
             </form>
         </div>
     );

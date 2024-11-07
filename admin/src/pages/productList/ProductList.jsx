@@ -10,10 +10,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 
 const ProductList = () => {
-
-    const [data, setData] = useState(productRows);
-    const dispatch = useDispatch();
     const products = useSelector(state => state.product.products);
+    const [data, setData] = useState(products);
+    const dispatch = useDispatch();
+    console.log(products)
 
     useEffect(() => {
         getProducts(dispatch)
@@ -53,7 +53,7 @@ const ProductList = () => {
             renderCell: (params) => {
                 return (
                     <div className="productListItem" key={params.row?._id}>
-                        <Link to={"/products/"+params.row?._id}>
+                        <Link to={"/products/" + params.row?._id}>
                             <button className="productListEdit">Edit</button>
                         </Link>
                         <DeleteOutline
@@ -68,8 +68,13 @@ const ProductList = () => {
 
     return (
         <div className='productList'>
+            <div className="productListHeader">
+                <Link to='/newProduct/'>
+                    <button className="productAddButton">Create</button>
+                </Link>
+            </div>
             <DataGrid
-                rows={products}
+                rows={data}
                 disableSelectionOnClick
                 columns={columns}
                 pageSize={8}

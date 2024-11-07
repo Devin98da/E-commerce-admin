@@ -10,6 +10,7 @@ if(persistRoot){
 
     if(userData){
         TOKEN = JSON.parse(userData).currentUser?.token || null;
+        console.log(TOKEN)
     }
 }
 

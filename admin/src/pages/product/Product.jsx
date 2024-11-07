@@ -11,6 +11,7 @@ const Product = () => {
 
     const location = useLocation();
     const productId = location.pathname.split("/")[2];
+    const [inputs, setInputs] = useState({});
     const product = useSelector(state => state.product.products.find((product) => product._id === productId));
 
     const [pStats, setPStats] = useState([]);
@@ -21,6 +22,19 @@ const Product = () => {
         ],
         []
     );
+
+    useEffect(() => {
+        if (product) {
+            setInputs({
+                title: product.title,
+                description: product.description,
+                price: product.price,
+                promotion: product.promotion,
+                inStock: product.inStock ? 'true' : 'false',
+                image: product.image
+            })
+        }
+    }, [product])
 
     useEffect(() => {
 
@@ -50,6 +64,18 @@ const Product = () => {
     }, [productId, MONTHS])
 
 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setInputs((prev) => (
+            {
+                ...prev,
+                [name]: value
+            }
+        ))
+    }
+
+    console.log(inputs)
+
     return (
         <div className='product'>
             <div className="productTitleContainer">
@@ -64,7 +90,7 @@ const Product = () => {
                 </div>
                 <div className="productTopRight">
                     <div className="productInfoTop">
-                        <img src={product.image} alt="" className="productInfoImg" />
+                        <img src={inputs.image} alt="" className="productInfoImg" />
                         <span className="productName">{product.title}</span>
                     </div>
                     <div className="productInfoBottom">
@@ -91,20 +117,22 @@ const Product = () => {
                 <form className="productForm">
                     <div className="productFormLeft">
                         <label>Product Name</label>
-                        <input type="text" placeholder={product.title} />
+                        <input name='name' type="text" value={inputs.title} onChange={handleInputChange}/>
                         <label>Product Description</label>
-                        <input type="text" placeholder={product.description} />
+                        <input name='description' type="text" value={inputs.description} onChange={handleInputChange}/>
                         <label>Product Price</label>
-                        <input type="text" placeholder={product.price} />
+                        <input name='price' type="text" value={inputs.price} onChange={handleInputChange}/>
+                        <label>Promotion</label>
+                        <input name='promotion' type="text" value={inputs.promotion} onChange={handleInputChange}/>
                         <label>In Stock</label>
-                        <select name="inStock" id="idStock">
+                        <select name="inStock" id="idStock" value={inputs.inStock} onChange={handleInputChange}>
                             <option value="true">Yes</option>
                             <option value="false">No</option>
                         </select>
                     </div>
                     <div className="productFormRight">
                         <div className="productUpload">
-                            <img src={product.image} alt="" className="productUploadImg" />
+                            <img src={inputs.image} alt="" className="productUploadImg" />
                             <label for="file">
                                 <Publish />
                             </label>
