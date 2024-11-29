@@ -7,6 +7,8 @@ import { Link } from 'react-router-dom';
 import { productRows } from "../../dummyData";
 import { deleteProduct, getProducts } from '../../redux/apiCalls';
 import { useDispatch, useSelector } from 'react-redux';
+import { getStorage, ref, deleteObject, getDownloadURL } from "firebase/storage";
+import app from '../../firebase';
 
 
 const ProductList = () => {
@@ -19,9 +21,18 @@ const ProductList = () => {
         getProducts(dispatch)
     }, [dispatch])
 
-    const handleDelete = (id) => {
-        deleteProduct(dispatch, id);
-        setData(data.filter(item => item.id !== id));
+    const handleDelete = async (product) => {
+        try {
+            const storage = getStorage(app);
+            const imageRef  = ref(storage, product.image);
+            await deleteObject(imageRef);
+            
+        } catch (error) {
+            console.log(error)
+        }
+        deleteProduct(dispatch, product._id);
+        console.log(product)
+        setData(data.filter(item => item.id !== product._id));
     }
     const paginationModel = { page: 0, pageSize: 5 };
 
@@ -58,7 +69,7 @@ const ProductList = () => {
                         </Link>
                         <DeleteOutline
                             className="productListDelete"
-                            onClick={() => handleDelete(params.row?._id)}
+                            onClick={() => handleDelete(params.row)}
                         />
                     </div>
                 );

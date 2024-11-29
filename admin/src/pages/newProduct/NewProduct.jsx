@@ -11,6 +11,8 @@ const NewProduct = () => {
     const [inputs, setInputs] = useState({});
     const [file, setFile] = useState(null);
     const [cat, setCat] = useState([]);
+    const [color, setColor] = useState([]);
+    const [size, setSize] = useState([]);
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -25,8 +27,16 @@ const NewProduct = () => {
     // console.log(inputs)
 
     const handleCat = (e) => {
-        setCat(e.target.value.split(","));
+        setCat(e.target.value.split(",").map(item => item.trim()));
     };
+
+    const handleColor = (e) => {
+        setColor(e.target.value.split(",").map(item => item.trim()));
+    }
+
+    const handleSize = (e) => {
+        setSize(e.target.value.split(",").map(item => item.trim()));
+    }
 
     const handleClick = (e) => {
         e.preventDefault();
@@ -63,7 +73,7 @@ const NewProduct = () => {
             },
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    const product = { ...inputs, image: downloadURL, categories: cat };
+                    const product = { ...inputs, image: downloadURL, categories: cat, size: size, color: color };
                     console.log(product)
                     addProduct(dispatch, product)
                         .then(() => {
@@ -110,6 +120,14 @@ const NewProduct = () => {
                 <div className="addProductItem">
                     <label>Promotion</label>
                     <input name='promotion' min={0} max={99} type="number" placeholder="100" onChange={handleChange} />
+                </div>
+                <div className="addProductItem">
+                    <label>Color</label>
+                    <input type="text" placeholder="black, red" onChange={handleColor} />
+                </div>
+                <div className="addProductItem">
+                    <label>Size</label>
+                    <input type="text" placeholder="s, m" onChange={handleSize} />
                 </div>
                 <div className="addProductItem">
                     <label>Stock</label>

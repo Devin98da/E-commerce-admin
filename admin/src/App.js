@@ -37,13 +37,13 @@ function Layout() {
 
   const isAuthenticated = currentUser?.token;
 
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     navigate('/');
-  //   } else {
-  //     navigate('/login');
-  //   }
-  // }, [isAuthenticated, navigate])
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    } else {
+      navigate('/login');
+    }
+  }, [isAuthenticated])
 
 
 
